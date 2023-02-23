@@ -28,23 +28,42 @@ const isMdFile = (pathInput) => {
 return (extFile === '.md') ? true : false;
 };
 
-console.log(isMdFile('index.js'));
+//----------RUTAS PARA PRUEBAS---------
+//console.log(isMdFile('index.js')); //archivo no .md
+//console.log(isMdFile('README.md')); //archivo .md
+//console.log(isMdFile('markdownFiles')); //es un directorio
 
 //5. Es un directorio? (recursividad para llegar a comprobar c/ruta dentro) Sincrono
-//let files = fs.readdirSync(pathInput)
-
+const isADirectoryOrFile = (pathInput) => {
+   let stats = fs.statSync(pathInput);
+   let dir = stats.isDirectory();
+   let file = stats.isFile();
+    return dir ? 'Directory' : file ? 'File' : 'error' ;
+};
+console.log(isADirectoryOrFile('README.md')); //es un directorio
 
 /*---------Para concatenar URLs se utiliza path.join('pathDIR', 'fileBasename) */
 
 //6. Almacenar todos los .md en un array de archivos md
 
 //7. Leer archivos md en busca de links (utilizar exreg) Asincrono
-// fs.readFile(pathInput, 'utf-8', (error, archivo) => {
-//     if(error){
-//         throw error;
-//     }
-//     console.log(archivo);
-// });
+function readMdFile(pathInput){
+const promise = new Promise (function(resolve, reject){
+if(isMdFile){
+    let archivo = fs.readFile(pathInput, 'utf-8', (error, archivo) => {
+        if(error){
+            throw error;
+        }
+        console.log(archivo);
+    });
+    resolve()
+}else{
+    reject(`no es un archivo .md`)
+}
+});
+}
+
+
 //8. Guardar todos los links en un array 
 //-----API------
 //9. Desea validad los links? Desea estadísticas? imprimir la info por defecto (array de todos los links encontrados)
