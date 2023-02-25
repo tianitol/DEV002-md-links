@@ -22,46 +22,72 @@ const realPath = (pathInput) => {
 
 //3. Es un archivo?
 
+const isAFile = (pathInput) => {
+    let stats = fs.statSync(pathInput);
+    let file = stats.isFile();
+    return file ? true : false;
+}
+
 //4. Es un archivo .md?
 const isMdFile = (pathInput) => {
     let extFile = path.extname(pathInput);
 return (extFile === '.md') ? true : false;
 };
 
+
 //----------RUTAS PARA PRUEBAS---------
 //console.log(isMdFile('index.js')); //archivo no .md
 //console.log(isMdFile('README.md')); //archivo .md
 //console.log(isMdFile('markdownFiles')); //es un directorio
 
-//5. Es un directorio? (recursividad para llegar a comprobar c/ruta dentro) Sincrono
-const isADirectoryOrFile = (pathInput) => {
+//3 y 5. Es un directorio? (recursividad para llegar a comprobar c/ruta dentro) Sincrono
+const isADirectory = (pathInput) => {
    let stats = fs.statSync(pathInput);
    let dir = stats.isDirectory();
-   let file = stats.isFile();
-    return dir ? 'Directory' : file ? 'File' : 'error' ;
+   return dir ? true : false;
 };
-console.log(isADirectoryOrFile('README.md')); //es un directorio
+
+
+//console.log(isADirectoryOrFile('README.md')); //es un directorio
 
 /*---------Para concatenar URLs se utiliza path.join('pathDIR', 'fileBasename) */
 
+
+
+
 //6. Almacenar todos los .md en un array de archivos md
 
+let mdArray = [];
+function arrayMdCreate (pathInput){
+
+    if(isAFile(pathInput) && isMdFile(pathInput)){
+mdArray.push(pathInput);
+    }else if (isADirectory(pathInput)){
+        return 'es un directorio, no se puede leer aun'
+
+    }
+    return mdArray;
+}
+
+console.log(arrayMdCreate('markdownFiles'))
+console.log(mdArray)
 //7. Leer archivos md en busca de links (utilizar exreg) Asincrono
-function readMdFile(pathInput){
-const promise = new Promise (function(resolve, reject){
-if(isMdFile){
-    let archivo = fs.readFile(pathInput, 'utf-8', (error, archivo) => {
-        if(error){
-            throw error;
-        }
-        console.log(archivo);
-    });
-    resolve()
-}else{
-    reject(`no es un archivo .md`)
-}
-});
-}
+
+// function readMdFile(pathInput){
+// const promise = new Promise (function(resolve, reject){
+// if(isMdFile){
+//     let archivo = fs.readFile(pathInput, 'utf-8', (error, archivo) => {
+//         if(error){
+//             throw error;
+//         }
+//         console.log(archivo);
+//     });
+//     resolve()
+// }else{
+//     reject(`no es un archivo .md`)
+// }
+// });
+// }
 
 
 //8. Guardar todos los links en un array 
@@ -74,6 +100,8 @@ if(isMdFile){
 //12. 
 
 //const mdLinks = (pathInput) => {
+
+
     // if(isAbsolute){
     //     console.log('La ruta: ' + pathInput + ' ingresada es absoluta')
         // if(realPath){
