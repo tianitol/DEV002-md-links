@@ -40,7 +40,7 @@ return (extFile === '.md') ? true : false;
 //console.log(isMdFile('README.md')); //archivo .md
 //console.log(isMdFile('markdownFiles')); //es un directorio
 
-//3 y 5. Es un directorio? (recursividad para llegar a comprobar c/ruta dentro) Sincrono
+//5. Es un directorio? (recursividad para llegar a comprobar c/ruta dentro) Sincrono
 const isADirectory = (pathInput) => {
    let stats = fs.statSync(pathInput);
    let dir = stats.isDirectory();
@@ -48,14 +48,15 @@ const isADirectory = (pathInput) => {
 };
 
 
-//console.log(isADirectoryOrFile('README.md')); //es un directorio
-
 /*---------Para concatenar URLs se utiliza path.join('pathDIR', 'fileBasename) */
 
+//6. Leer directorios para obtener archivos .md
 
+const readDir = (pathInput) => {
+    return fs.readdirSync(pathInput);
+};
 
-
-//6. Almacenar todos los .md en un array de archivos md
+//7. Almacenar todos los .md en un array de archivos md
 
 let mdArray = [];
 function arrayMdCreate (pathInput){
@@ -63,14 +64,15 @@ function arrayMdCreate (pathInput){
     if(isAFile(pathInput) && isMdFile(pathInput)){
 mdArray.push(pathInput);
     }else if (isADirectory(pathInput)){
-        return 'es un directorio, no se puede leer aun'
+        return 'es un directorio, no se puede leer aun';
 
     }
     return mdArray;
-}
+};
 
-console.log(arrayMdCreate('markdownFiles'))
-console.log(mdArray)
+console.log(readDir('README.md'))
+//console.log(mdArray)
+
 //7. Leer archivos md en busca de links (utilizar exreg) Asincrono
 
 // function readMdFile(pathInput){
