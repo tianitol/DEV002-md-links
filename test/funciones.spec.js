@@ -94,6 +94,12 @@ describe('readMdFile', () => {
             expect(readMdFile).toBe(typeof 'promise');
         })
         .catch((error) => error));
+    it('debe devolver el contenido del archivo', () => {
+        return expect(readMdFile(archivoTexto)).resolves.toBe('Me puedes leer, soy un archivo .txt')
+    });  
+    it('debe fallar con un error', () => {
+        return expect(readMdFile(rutaNoExiste)).rejects.toMatch('error');
+    });  
 });
 
 describe('createLinkArray', () => {
@@ -105,4 +111,11 @@ describe('createLinkArray', () => {
             expect(createLinkArray).toBe(typeof 'promise');
         })
         .catch((error) => error));
+    it('debe devolver un array de links', () => {
+        return expect(createLinkArray(rutaAbsoluta)).resolves.toBe(['https://docs.npmjs.com/cli/install', 'https://github.com/Laboratoria/course-parser']);
+    });
+    it('debe fallar con un error', () => {
+        return expect(createLinkArray(rutaNoExiste)).rejects.toMatch('error');
+    })
+
 });

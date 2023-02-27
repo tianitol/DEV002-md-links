@@ -40,15 +40,12 @@ const isMdFile = (pathInput) => {
 //console.log(isMdFile('README.md')); //archivo .md
 //console.log(isMdFile('markdownFiles')); //es un directorio
 
-//5. Es un directorio? (recursividad para llegar a comprobar c/ruta dentro) Sincrono
+//5. Es un directorio?
 const isADirectory = (pathInput) => {
     let stats = fs.statSync(pathInput);
     let dir = stats.isDirectory();
     return dir ? true : false;
 };
-
-
-/*---------Para concatenar URLs se utiliza path.join('pathDIR', 'fileBasename) */
 
 //6. Leer directorios para obtener archivos .md
 
@@ -85,7 +82,7 @@ const readMdFile = (pathInput) => {
     return new Promise((resolve, reject) => {
         fs.readFile(pathInput, 'utf-8', (error, archivo) => {
             if (error) {
-                reject(error);
+                reject('error');
             }
             resolve(archivo);
         });
@@ -112,7 +109,7 @@ const createLinkArray = (pathInput) => {
                 }
                 resolve(LinkArray);
             })
-            .catch((error)=> reject(error));
+            .catch((error)=> reject('error'));
     });
 };
 //console.log(createLinkArray('/Users/tsukito/Library/CloudStorage/OneDrive-Personal/LABORATORIA/mdlinks/DEV002-md-links/markdownFiles/markdownLinks.md'))
