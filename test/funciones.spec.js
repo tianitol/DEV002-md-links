@@ -1,4 +1,4 @@
-const { isAbsolute, relativeToAbsolute, realPath, isAFile, isMdFile, isADirectory, createMdArray, readMdFile, createLinkArray } = require('../funciones.js');
+const { isAbsolute, relativeToAbsolute, realPath, isAFile, isMdFile, isADirectory, createMdArray, readMdFile, createLinkArray, resLinks } = require('../funciones.js');
 
 //RUTAS para prueba
 const archivoNoMd = 'index.js';
@@ -8,7 +8,45 @@ const rutaAbsoluta = '/Users/tsukito/Library/CloudStorage/OneDrive-Personal/LABO
 const rutaNoExiste = 'Users/tsukito/Library/CloudStorage/OneDrive-Personal/LABORATORIA/mdlinks/DEV002-md-links/markdownFiles/markdownLinks.md';
 const rutaRelativa = 'markdownFiles/markdownLinks.md';
 const archivoTexto = '/Users/tsukito/Library/CloudStorage/OneDrive-Personal/LABORATORIA/mdlinks/DEV002-md-links/markdownFiles/archivo.txt';
+const arrayLinks = [
+    {
+      href: 'https://docs.npmjs.com/cli/install',
+      text: 'docs oficiales de `npm install` acá',
+      file: '/Users/tsukito/Library/CloudStorage/OneDrive-Personal/LABORATORIA/mdlinks/DEV002-md-links/markdownFiles/markdownLinks.md'
+    },
+    {
+      href: 'https://github.com/Laboratoria/course-parser',
+      text: '`course-parser`',
+      file: '/Users/tsukito/Library/CloudStorage/OneDrive-Personal/LABORATORIA/mdlinks/DEV002-md-links/markdownFiles/markdownLinks.md'
+    },
+    {
+      href: 'https://webempresa.com/blogg.html',
+      text: 'página error',
+      file: '/Users/tsukito/Library/CloudStorage/OneDrive-Personal/LABORATORIA/mdlinks/DEV002-md-links/markdownFiles/markdownLinks.md'
+    }
+  ];
 
+  const LinksValidados = [{
+    href: 'https://docs.npmjs.com/cli/install',
+    text: 'docs oficiales de `npm install` acá',
+    file: '/Users/tsukito/Library/CloudStorage/OneDrive-Personal/LABORATORIA/mdlinks/DEV002-md-links/markdownFiles/markdownLinks.md',
+    status: 200,
+    ok: 'ok'
+  },
+  {
+    href: 'https://github.com/Laboratoria/course-parser',
+    text: '`course-parser`',
+    file: '/Users/tsukito/Library/CloudStorage/OneDrive-Personal/LABORATORIA/mdlinks/DEV002-md-links/markdownFiles/markdownLinks.md',
+    status: 200,
+    ok: 'ok'
+  },
+  {
+    href: 'https://webempresa.com/blogg.html',
+    text: 'página error',
+    file: '/Users/tsukito/Library/CloudStorage/OneDrive-Personal/LABORATORIA/mdlinks/DEV002-md-links/markdownFiles/markdownLinks.md',
+    status: 404,
+    ok: 'fail'
+  }];
 
 
 describe('isAbsolute', () => {
@@ -112,10 +150,19 @@ describe('createLinkArray', () => {
         })
         .catch((error) => error));
     it('debe devolver un array de links', () => {
-        return expect(createLinkArray(rutaAbsoluta)).resolves.toBe(['https://docs.npmjs.com/cli/install', 'https://github.com/Laboratoria/course-parser']);
+        return expect(createLinkArray(rutaAbsoluta)).resolves.toStrictEqual(arrayLinks);
     });
     it('debe fallar con un error', () => {
         return expect(createLinkArray(rutaNoExiste)).rejects.toMatch('error');
-    })
+    });
 
+});
+
+describe('resLinks', () => {
+    it('debe devolver links validados como objetos', () => {
+        return expect(resLinks(arrayLinks)).resolves.toStrictEqual(LinksValidados);
+    });
+    it('debe fallar con un error', () => {
+        return expect(resLinks([{href:1}])).rejects.toMatch('error');
+    });
 });

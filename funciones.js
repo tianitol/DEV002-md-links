@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const fetch = require('node-fetch');
 
 //----------TO DO LIST----------
 
@@ -76,48 +77,94 @@ function createMdArray(pathInput) {
 //podría comenzar leyendo el o los archivos (mdArray) Async transformandolo/s en un array con split ' '
 //Luego aplicar un filter por la urlExpReg, así se obtiene el arrayde URLS
 
-//8.1 leer archivos de forma asincrona(promesas)
+//8 leer archivos de forma asincrona(promesas)
 
 const readMdFile = (pathInput) => {
     return new Promise((resolve, reject) => {
-        fs.readFile(pathInput, 'utf-8', (error, archivo) => {
+        fs.readFile(pathInput, 'utf-8', (error, contenido) => {
             if (error) {
-                reject('error');
+               return reject('error');
             }
-            resolve(archivo);
+           return  resolve(contenido);
         });
     });
 };
 
-console.log(readMdFile('markdownFiles/archivo.txt'))
+//console.log(readMdFile('markdownFiles/archivo.txt'))
 
-//8.2 obrener los links 
+//9 obrener y guardar todos los links en un array de objetos, c/link es un objeto, contiene lo siguiente {href: , text: , file: pathInput}
+
 const createLinkArray = (pathInput) => {
+    
+    const urlExpReg = /\[(.+?)\]\((https?:\/\/[^\s]+)(?: "(.+)")?\)|(https?:\/\/[^\s]+)/ig;
     return new Promise ((resolve, reject) => {
-        let LinkArray = [];
+        const linkArray = [];
         readMdFile(pathInput)
             .then((data) => {
-                const urlExpReg = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/;
-                // let fileArray = data.split(' ');
-                // console.log(fileArray);//las url no están separadas por espacio en algunos casos, por lo que no sirve split(' ')
-                // let links = fileArray.filter(urlExpReg);
                 //console.log(data)
                 let link = urlExpReg.exec(data);
+               // console.log(link)
                 while(link !== null){
-                    LinkArray.push(link);
-                    link =urlExpReg.exec(data);
+                    linkArray.push({
+                        href: link[2],
+                        text: link[1],
+                        file: pathInput,
+                    });
+
+                    link = urlExpReg.exec(data);
+
                 }
-                resolve(LinkArray);
+                //console.log(linkArray)
+
+               return  resolve(linkArray);
             })
             .catch((error)=> reject('error'));
     });
 };
-//console.log(createLinkArray('/Users/tsukito/Library/CloudStorage/OneDrive-Personal/LABORATORIA/mdlinks/DEV002-md-links/markdownFiles/markdownLinks.md'))
 
-//9. Guardar todos los links en un array 
+
+
+
+//10. imprimir el array de links como respuesta por defecto
+
+//11. imprimir el array de links validados (options validate) ---> los imprime como objetos, c/link es un objeto separado
+//Ya teniendo el array de links, someter cada uno a la petición HTTP con fetch() para obtener el status y el ok
+
+//const arrayObjectRes = [];
+
+const resLinks = (linkArray) => Promise.all(linkArray.map((objectLink) => fetch(objectLink.href)
+.then((res) => {
+
+    const objectRes = {
+        ...objectLink,
+        status: res.status,
+        ok: res.ok ? 'ok' : 'fail',
+    };
+   //arrayObjectRes.push(objectRes);
+   console.log(objectRes)
+   
+//return arrayObjectRes;
+   return objectRes;
+})
+.catch((error) => 'error')
+));
+
+//createLinkArray('/Users/tsukito/Library/CloudStorage/OneDrive-Personal/LABORATORIA/mdlinks/DEV002-md-links/markdownFiles/markdownLinks.md');
+
+
+resLinks()
+//createLinkArray('README.md')
+
+
 //-----API------
 //10. Desea validad los links? Desea estadísticas? imprimir la info por defecto (array de todos los links encontrados)
 //11. --validate:true, realizar la petición HTTP mediante fetch() para obtener estado y codigo
+
+//---------URL de prueb***
+//const urlPrueba = 'https://www.atatus.com/blog/fetch-api-in-nodejs/';
+
+
+
 //12. --status, a través de lo obtenido mediante la validación, arrojar links totales y unicos
 //12.1 se debe hacer una función para eliminar los links repetidos (puede ser un array que no permita dos elementos iguales)
 //-----CLI------
@@ -182,5 +229,6 @@ module.exports = {
     isADirectory,
     createMdArray,
     readMdFile,
-    createLinkArray
+    createLinkArray,
+    resLinks
 };
