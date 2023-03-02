@@ -1,4 +1,4 @@
-const { isAbsolute, relativeToAbsolute, realPath, isAFile, isMdFile, isADirectory, createMdArray, readMdFile, createLinkArray, resLinks } = require('../funciones.js');
+const { isAbsolute, relativeToAbsolute, realPath, isAFile, isMdFile, isADirectory, createMdArray, readMdFile, createLinkArray, resLinks, areAllMd } = require('../funciones.js');
 
 //RUTAS para prueba
 const archivoNoMd = 'index.js';
@@ -47,6 +47,11 @@ const arrayLinks = [
     status: 404,
     ok: 'fail'
   }];
+
+  const arrayMd = [
+    '/Users/tsukito/Library/CloudStorage/OneDrive-Personal/LABORATORIA/mdlinks/DEV002-md-links/markdownFiles/markdownLinks.md',
+    '/Users/tsukito/Library/CloudStorage/OneDrive-Personal/LABORATORIA/mdlinks/DEV002-md-links/markdownFiles/markdownNolinks.md'
+  ];
 
 
 describe('isAbsolute', () => {
@@ -165,4 +170,20 @@ describe('resLinks', () => {
     it('debe fallar con un error', () => {
         return expect(resLinks([{href:1}])).rejects.toMatch('error');
     });
+});
+
+describe('areAllMd', () => {
+    it('si se llama con ruta relativa, createMdArray devuelve un array de .mds con ruta absoluta', () => {
+        areAllMd(directorio);
+        expect(areAllMd(directorio)).toEqual(arrayMd);
+    });
+    it('si se llama con ruta absoluta, createMdArray devuelve un array de .mds con ruta absoluta', () => {
+        areAllMd('/Users/tsukito/Library/CloudStorage/OneDrive-Personal/LABORATORIA/mdlinks/DEV002-md-links/markdownFiles');
+        expect(areAllMd('/Users/tsukito/Library/CloudStorage/OneDrive-Personal/LABORATORIA/mdlinks/DEV002-md-links/markdownFiles')).toEqual(arrayMd);
+    })
+    it('si la ruta no existe debe arrojar un error', () => {
+        areAllMd(rutaNoExiste);
+        expect(areAllMd(rutaNoExiste)).toThrow();
+    });
+    
 });

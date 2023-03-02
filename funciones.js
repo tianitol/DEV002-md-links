@@ -66,6 +66,7 @@ function createMdArray(pathInput) {
             mdArray = mdArray.concat(createMdArray(`${pathInput}/${filesDirArray}`));
         });
     }
+    //console.log(mdArray)
     return mdArray;
 };
 
@@ -141,7 +142,7 @@ const resLinks = (linkArray) => Promise.all(linkArray.map((objectLink) => fetch(
         ok: res.ok ? 'ok' : 'fail',
     };
    //arrayObjectRes.push(objectRes);
-   console.log(objectRes)
+   //console.log(objectRes)
    
 //return arrayObjectRes;
    return objectRes;
@@ -152,9 +153,20 @@ const resLinks = (linkArray) => Promise.all(linkArray.map((objectLink) => fetch(
 //createLinkArray('/Users/tsukito/Library/CloudStorage/OneDrive-Personal/LABORATORIA/mdlinks/DEV002-md-links/markdownFiles/markdownLinks.md');
 
 
-resLinks()
+//resLinks([{href:1}])
 //createLinkArray('README.md')
 
+// validar que rutas existan y sean absolutas para pasarlas a la función que crea el array de archivos .md
+const areAllMd = (pathInput) => {
+   if(realPath(pathInput)){
+    isAbsolute(pathInput) ? pathInput : (pathInput = relativeToAbsolute(pathInput));
+   }else{
+    throw Error('la ruta no existe');   
+   }
+   return createMdArray(pathInput);
+};
+
+//console.log(areAllMd('markdownFiles')); //con ruta relativa y ruta absoluta da igual rutas absolutas :D
 
 //-----API------
 //10. Desea validad los links? Desea estadísticas? imprimir la info por defecto (array de todos los links encontrados)
@@ -230,5 +242,6 @@ module.exports = {
     createMdArray,
     readMdFile,
     createLinkArray,
-    resLinks
+    resLinks,
+    areAllMd
 };

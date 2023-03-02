@@ -1,6 +1,9 @@
 {
   "name": "nito-md-links",
   "version": "0.1.0",
+  "bin": {
+    "outside": "bin/outside"
+  },
   "engines": {
     "node": ">=16.x"
   },
@@ -29,5 +32,9 @@
   "homepage": "https://github.com/tianitol/DEV002-md-links#readme",
   "devDependencies": {
     "jest": "^29.4.3"
+  },
+  "dependencies": {
+    "node-fecth": "^0.0.1-security",
+    "node-fetch": "^2.6.9"
   }
 }
