@@ -12,6 +12,8 @@ let option1 = argv[3];
 let option2 = argv[4];
 let options = [option1, option2]
 
+console.log('nito-mdlinks');
+
 md_links(path, options);
 
 module.exports = {md_links};
