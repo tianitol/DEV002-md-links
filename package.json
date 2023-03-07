@@ -2,8 +2,7 @@
   "name": "nito-md-links",
   "version": "0.1.0",
   "bin": {
-    "outside": "bin/outside"
-  },
+    "tran": "CLI.js"},
   "engines": {
     "node": ">=16.x"
   },
@@ -12,8 +11,8 @@
     "version": "5.5.0",
     "commit": "51e941edf1cc991930aefd7dd9c406a7c43741c1"
   },
-  "description": "## Índice",
-  "main": "index.js",
+  "description": "a CLI to validate links into .md files",
+  "main": "CLI.js",
   "directories": {
     "test": "test"
   },
@@ -27,7 +26,7 @@
   "author": "Nicole Henríquez Solís",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/tianitol/DEV002-md-links/issues"
+    "url": "https://github.com/tianitol/DEV002-md-links"
   },
   "homepage": "https://github.com/tianitol/DEV002-md-links#readme",
   "devDependencies": {

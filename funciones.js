@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const fetch = require('node-fetch');
+const { resolve } = require('path');
 
 //----------TO DO LIST----------
 
@@ -72,40 +73,36 @@ function createMdArray(pathInput) {
 
 //console.log(createMdArray('/Users/tsukito/Library/CloudStorage/OneDrive-Personal/LABORATORIA/mdlinks/DEV002-md-links'))
 
-
-//8. Leer archivos md en busca de links (utilizar exreg) Asincrono
-
 //podría comenzar leyendo el o los archivos (mdArray) Async transformandolo/s en un array con split ' '
 //Luego aplicar un filter por la urlExpReg, así se obtiene el arrayde URLS
 
-//8 leer archivos de forma asincrona(promesas)
+//8. leer archivos de forma asincrona(promesas)
 
 const readMdFile = (pathInput) => {
     return new Promise((resolve, reject) => {
         fs.readFile(pathInput, 'utf-8', (error, contenido) => {
             if (error) {
-               return reject('error');
+                return reject('error');
             }
-           return  resolve(contenido);
+            return resolve(contenido);
         });
     });
 };
 
 //console.log(readMdFile('markdownFiles/archivo.txt'))
 
-//9 obrener y guardar todos los links en un array de objetos, c/link es un objeto, contiene lo siguiente {href: , text: , file: pathInput}
+//9. obtener y guardar todos los links en un array de objetos, c/link es un objeto, contiene lo siguiente {href: , text: , file: pathInput}
 
 const createLinkArray = (pathInput) => {
-    
     const urlExpReg = /\[(.+?)\]\((https?:\/\/[^\s]+)(?: "(.+)")?\)|(https?:\/\/[^\s]+)/ig;
-    return new Promise ((resolve, reject) => {
+    return new Promise((resolve, reject) => {
         const linkArray = [];
         readMdFile(pathInput)
             .then((data) => {
                 //console.log(data)
                 let link = urlExpReg.exec(data);
-               // console.log(link)
-                while(link !== null){
+                // console.log(link)
+                while (link !== null) {
                     linkArray.push({
                         href: link[2],
                         text: link[1],
@@ -117,9 +114,9 @@ const createLinkArray = (pathInput) => {
                 }
                 //console.log(linkArray)
 
-               return  resolve(linkArray);
+                return resolve(linkArray);
             })
-            .catch((error)=> reject('error'));
+            .catch((error) => reject('error'));
     });
 };
 
@@ -128,27 +125,49 @@ const createLinkArray = (pathInput) => {
 
 //10. imprimir el array de links como respuesta por defecto
 
-//11. imprimir el array de links validados (options validate) ---> los imprime como objetos, c/link es un objeto separado
+//11. imprimir  links validados (options validate) ---> los imprime como objetos, c/link es un objeto separado
 //Ya teniendo el array de links, someter cada uno a la petición HTTP con fetch() para obtener el status y el ok
 
 //const arrayObjectRes = [];
 
 const resLinks = (linkArray) => Promise.all(linkArray.map((objectLink) => fetch(objectLink.href)
-.then((res) => {
+    .then((res) => {
 
-    const objectRes = {
-        ...objectLink,
-        status: res.status,
-        ok: res.ok ? 'ok' : 'fail',
-    };
-   //arrayObjectRes.push(objectRes);
-   //console.log(objectRes)
-   
-//return arrayObjectRes;
-   return objectRes;
-})
-.catch((error) => 'error')
+        const objectRes = {
+            ...objectLink,
+            status: res.status,
+            ok: res.ok ? 'ok' : 'fail',
+        };
+        //console.log(objectRes)
+
+        return objectRes;
+    })
+    .catch((error) => 'error con la obtención de links')
 ));
+
+//12. Estadisticas y validación
+
+//links totales y únicos (--stats)
+const stadistics = (linkArray) => {
+    const linkArrayHref = linkArray.map((link) => link.href);
+    const uniqueLinks = [...new Set(linkArrayHref)];
+    return {
+        total: linkArrayHref.length,
+        unique: uniqueLinks.length
+    }
+};
+
+//links totales, unicos y rotos (--stats, --validate)
+const brokenLinkStats = (linkArray) => {
+    const broken = linkArray.filter((link) => link.ok === 'fail');
+    return {
+        total: linkArray.length,
+        unique: stadistics(linkArray).unique,
+        broken: broken.length
+    }
+};
+
+
 
 //createLinkArray('/Users/tsukito/Library/CloudStorage/OneDrive-Personal/LABORATORIA/mdlinks/DEV002-md-links/markdownFiles/markdownLinks.md');
 
@@ -158,79 +177,16 @@ const resLinks = (linkArray) => Promise.all(linkArray.map((objectLink) => fetch(
 
 // validar que rutas existan y sean absolutas para pasarlas a la función que crea el array de archivos .md
 const areAllMd = (pathInput) => {
-   if(realPath(pathInput)){
-    isAbsolute(pathInput) ? pathInput : (pathInput = relativeToAbsolute(pathInput));
-   }else{
-    throw Error('la ruta no existe');   
-   }
-   return createMdArray(pathInput);
+    if (realPath(pathInput)) {
+        isAbsolute(pathInput) ? pathInput : (pathInput = relativeToAbsolute(pathInput));
+    } else {
+        console.error('la ruta no existe');
+    }
+    return createMdArray(pathInput);
 };
 
-//console.log(areAllMd('markdownFiles')); //con ruta relativa y ruta absoluta da igual rutas absolutas :D
-
-//-----API------
-//10. Desea validad los links? Desea estadísticas? imprimir la info por defecto (array de todos los links encontrados)
-//11. --validate:true, realizar la petición HTTP mediante fetch() para obtener estado y codigo
-
-//---------URL de prueb***
-//const urlPrueba = 'https://www.atatus.com/blog/fetch-api-in-nodejs/';
 
 
-
-//12. --status, a través de lo obtenido mediante la validación, arrojar links totales y unicos
-//12.1 se debe hacer una función para eliminar los links repetidos (puede ser un array que no permita dos elementos iguales)
-//-----CLI------
-//13. 
-
-//const mdLinks = (pathInput) => {
-
-
-    // if(isAbsolute){
-    //     console.log('La ruta: ' + pathInput + ' ingresada es absoluta')
-        // if(realPath){
-        //     return pathInput;
-        // }else{
-        //     console.log('La ruta: ' + pathInput + ' no existe en esta computadora');
-        // }
-    // }else{
-    //     console.log('La ruta: ' + pathInput + ' ingresada es relativa')
-        // let rutaResuelta = relativeToAbsolute(pathInput);
-
-        // if(realPath){
-        //    return rutaResuelta;
-        // }else{
-        //     console.log('La ruta: ' + rutaResuelta + ' no existe en esta computadora')
-        // }
-//     }
-// }
-//función para validar el Path (requiere el path)
-
-// function validationPath(pathInput) { //la ruta es válida?
-//     if (pathInput == undefined) {
-//         return undefined;
-//     }
-//     else if (path.isAbsolute(pathInput)) {
-//         console.log('La ruta: ' + pathInput + ' ingresada es absoluta')
-//         if(fs.existsSync(pathInput)){
-//             return pathInput
-
-//         }else{
-//             console.log('La ruta: ' + pathInput + ' no existe en esta computadora');
-//         }
-//     }else {
-//         console.log('La ruta: ' + pathInput + ' ingresada es relativa');
-//         let rutaResuelta = path.resolve(process.cwd(), pathInput);
-//         console.log('Ruta resuelta: ' + rutaResuelta);
-//         if(fs.existsSync(rutaResuelta)){
-//             return rutaResuelta
-//         }else{
-//             console.log('La ruta: ' + rutaResuelta + ' no existe en esta computadora')
-//         }
-
-//     }
-// };
-
-//console.log(realPath(relativeToAbsolute('RADME.md')));
 
 module.exports = {
     isAbsolute,
@@ -243,5 +199,7 @@ module.exports = {
     readMdFile,
     createLinkArray,
     resLinks,
-    areAllMd
+    areAllMd,
+    stadistics,
+    brokenLinkStats
 };

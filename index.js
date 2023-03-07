@@ -1,14 +1,27 @@
-const {areAllMd, createMdArray, createLinkArray, resLinks} = require("./funciones");
-const {md_links} = require('./CLI.js');
+const { md_links } = require('./md_links_process');
 
 
-function mdLinks(path, options){
-  
-
+function mdLinksAPI(pathInput, options) {
+  return new Promise((resolve, reject) => {
+    if ((options === null || options === undefined || options === '') || options === '{validate:false}' || options.validate === false) {
+      md_links(pathInput, '')
+        .then(links => {
+          resolve(links)
+        })
+        .catch((error) => reject(error))
+    }
+    else if (options === '{validate:true}' || options.validate === true) {
+      md_links(pathInput, ['--validate'])
+        .then(resultado => {
+          resolve(resultado)
+        })
+        .catch((error) => reject(error))
+    };
+  });
 };
 
-mdLinks('/Users/tsukito/Library/CloudStorage/OneDrive-Personal/LABORATORIA/mdlinks/DEV002-md-links/README.md');
+//mdLinksAPI('markdownFiles', '{validate:true}');
 
-module.exports = () => {
-  mdLinks
+module.exports = {
+  mdLinksAPI
 };
